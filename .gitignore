@@ -1,0 +1,18 @@
+# Python virtual environment
+venv/
+env/
+ENV/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database file
+notes.db
+
+# Environment variables & IDE config
+.env
+.vscode/
+.idea/
+.DS_Store
