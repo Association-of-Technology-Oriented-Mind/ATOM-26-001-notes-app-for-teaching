@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - Clean & Modern Flask App</title>
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- App Header & Navigation Bar -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="{{ url_for('index') }}" class="brand">
+                <div class="brand-icon">📝</div>
+                <span>Notes</span>
+            </a>
+
+            <div class="header-actions">
+                <!-- Search Form -->
+                <form action="{{ url_for('search') }}" method="GET" class="search-form">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        class="search-input" 
+                        placeholder="Search title or content..."
+                        value="{{ search_query if search_query else '' }}"
+                        aria-label="Search Notes"
+                    >
+                    {% if search_query %}
+                        <a href="{{ url_for('index') }}" class="clear-btn" title="Clear Search">✕</a>
+                    {% endif %}
+                    <button type="submit" class="search-btn" title="Search">🔍</button>
+                </form>
+
+                <!-- New Note Toggle Button -->
+                <button id="toggle-note-form-btn" class="btn btn-primary">
+                    <span>+ New Note</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Flash Messages Notification Area -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-container">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                <span>{{ message }}</span>
+                                <button class="flash-close" aria-label="Close notification">✕</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Collapsible New Note Form Card -->
+            <div id="new-note-card" class="card-form new-note-card">
+                <h2 class="section-title" style="margin-bottom: 1rem;">Create New Note</h2>
+                <form id="add-note-form" action="{{ url_for('add_note') }}" method="POST">
+                    <div class="form-group">
+                        <label for="note-title-input" class="form-label">Title</label>
+                        <input 
+                            type="text" 
+                            id="note-title-input" 
+                            name="title" 
+                            class="form-control" 
+                            placeholder="Enter note title..." 
+                            maxlength="100"
+                            required
+                        >
+                        <div class="form-help">
+                            <span>Keep it concise and clear</span>
+                            <span id="title-char-count" class="char-counter">0 / 100</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="note-content-input" class="form-label">Content</label>
+                        <textarea 
+                            id="note-content-input" 
+                            name="content" 
+                            class="form-control" 
+                            placeholder="Write your note thoughts here..." 
+                            required
+                        ></textarea>
+                        <div class="form-help">
+                            <span>Markdown/Text supported</span>
+                            <span id="content-char-count" class="char-counter">0 chars</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancel-note-btn" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Note</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Section Header / Search Status -->
+            <div class="section-header">
+                {% if search_query %}
+                    <h2 class="section-title">
+                        Search Results for <span style="color: var(--accent);">"{{ search_query }}"</span>
+                    </h2>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary" style="font-size: 0.85rem;">View All Notes</a>
+                {% else %}
+                    <h2 class="section-title">All Notes</h2>
+                    <span class="search-results-info">{{ notes|length }} {% if notes|length == 1 %}note{% else %}notes{% endif %}</span>
+                {% endif %}
+            </div>
+
+            <!-- Notes Grid View -->
+            {% if notes %}
+                <div class="notes-grid">
+                    {% for note in notes %}
+                        <div class="note-card">
+                            <div class="note-header">
+                                <h3 class="note-title">
+                                    <a href="{{ url_for('view_note', id=note['id']) }}">{{ note['title'] }}</a>
+                                </h3>
+                            </div>
+                            
+                            <div class="note-body">{{ note['content'] }}</div>
+                            
+                            <div class="note-footer">
+                                <span class="note-date">
+                                    🕒 {{ note['updated_at'] }}
+                                </span>
+
+                                <div class="note-actions">
+                                    <a href="{{ url_for('view_note', id=note['id']) }}" class="btn btn-secondary btn-icon-only" title="View Note">👁️</a>
+                                    <a href="{{ url_for('edit_note', id=note['id']) }}" class="btn btn-secondary btn-icon-only" title="Edit Note">✏️</a>
+                                    
+                                    <form action="{{ url_for('delete_note', id=note['id']) }}" method="POST" class="delete-form" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger btn-icon-only" title="Delete Note">🗑️</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Empty State Banner -->
+                <div class="empty-state">
+                    <div class="empty-icon">📌</div>
+                    {% if search_query %}
+                        <h3 class="empty-title">No notes found matching "{{ search_query }}"</h3>
+                        <p class="empty-desc">Try checking for typos or searching for a different keyword.</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">Back to All Notes</a>
+                    {% else %}
+                        <h3 class="empty-title">No Notes Yet</h3>
+                        <p class="empty-desc">Start capturing your thoughts, task lists, or meeting notes.</p>
+                        <button onclick="document.getElementById('toggle-note-form-btn').click()" class="btn btn-primary">Create Your First Note</button>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal Overlay -->
+    <div id="delete-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="modal-title">Delete Note?</h3>
+            <p class="modal-body">Are you sure you want to delete this note? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+                <button id="modal-confirm-btn" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vanilla JS Script -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
