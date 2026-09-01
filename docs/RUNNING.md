@@ -41,9 +41,14 @@ Creating a virtual environment isolates project dependencies from your system's 
 
 ### 3. Activate the Virtual Environment
 
-- **macOS / Linux:**
+- **macOS / Linux (Bash / Zsh):**
   ```bash
   source venv/bin/activate
+  ```
+
+- **macOS / Linux (Fish Shell):**
+  ```fish
+  source venv/bin/activate.fish
   ```
 
 - **Windows (Command Prompt):**
@@ -56,7 +61,12 @@ Creating a virtual environment isolates project dependencies from your system's 
   .\venv\Scripts\Activate.ps1
   ```
 
-*(Once activated, your terminal prompt will display a `(venv)` prefix).*
+> 💡 **Universal Method (No Activation Required)**:
+> You can also run the application directly in any shell without activation:
+> ```bash
+> ./venv/bin/python app.py
+> ```
+
 
 ---
 

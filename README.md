@@ -78,20 +78,32 @@ A virtual environment ensures project dependencies don't conflict with your glob
 
 ### 3. Activate the Virtual Environment
 
-- **macOS / Linux:**
+- **macOS / Linux (Bash / Zsh):**
   ```bash
   source venv/bin/activate
   ```
+
+- **macOS / Linux (Fish Shell):**
+  ```fish
+  source venv/bin/activate.fish
+  ```
+
 - **Windows (Command Prompt):**
   ```cmd
   venv\Scripts\activate
   ```
+
 - **Windows (PowerShell):**
   ```powershell
   .\venv\Scripts\Activate.ps1
   ```
 
-*(When activated, your terminal prompt will display a `(venv)` prefix).*
+> 💡 **Universal Shortcut (No Activation Needed)**:
+> You can run the app directly in any shell without activating `venv`:
+> ```bash
+> ./venv/bin/python app.py
+> ```
+
 
 ### 4. Install Dependencies
 Install the required packages:
